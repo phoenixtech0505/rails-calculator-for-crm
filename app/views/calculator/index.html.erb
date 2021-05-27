@@ -1,0 +1,94 @@
+# app/views/calculator/index.html.erb
+<div class="container">
+  <h1>Rails Calculator</h1>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="display text-right" id="display">
+        0
+      </div>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-md-6">
+      <input type="number" class="form-control" id="int_a" name="int_a" />
+      <div class="valid-feedback">Valid.</div>
+      <div class="invalid-feedback">Please fill out this field with integer between 0 - 100.</div>
+    </div>
+    <div class="col-md-6">
+      <input type="number" class="form-control" id="int_b" name="int_b" />
+      <div class="valid-feedback">Valid.</div>
+      <div class="invalid-feedback">Please fill out this field with integer between 0 - 100.</div>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-md-3">
+      <button class="btn btn-primary btn-lg btn-block btn-white" id="add">+</button>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary btn-lg btn-block btn-white" id="subtract">-</button>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary btn-lg btn-block btn-white" id="multiply">x</button>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary btn-lg btn-block btn-white" id="division">/</button>
+    </div>
+  </div>
+</div>
+
+<% content_for :custom_script do %>
+  <script>
+    $("button").on('click', function() {
+        $opt = $(this).text();
+        calculate($opt);
+    });
+
+    function calculate($opt) {
+        if($("#int_a").val() !== '' && $("#int_b").val() !== '') {
+            if((0 <= parseInt($("#int_a").val()) && parseInt($("#int_a").val()) <= 100) && (0 <= parseInt($("#int_b").val()) && parseInt($("#int_b").val()) <= 100)) {
+                $("button").prop('disabled', true);
+                const int_a = parseInt($("#int_a").val());
+                const int_b = parseInt($("#int_b").val());
+                const operator = $opt;
+                console.log(int_a, int_b, operator);
+                const csrfToken = document.querySelector('[name="csrf-token"]').getAttribute('content');
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/v1/calculator',
+                    dataType: 'json',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': csrfToken
+                    },
+                    data: JSON.stringify({ int_a: int_a, int_b: int_b, operator: operator }),
+                    success: function(data) {
+                        console.log(data);
+                        $("#display").text(data.data.result);
+                        $("button").prop('disabled', false);
+                    }
+                });
+            }
+        }
+     }
+
+    $("#int_a").on('keyup', function() {
+        if($(this).val() !== '' && $(this).val() > -1 && $(this).val() < 101) {
+            $(this).removeClass('is-invalid');
+            $(this).addClass('is-valid');
+        } else {
+            $(this).removeClass('is-valid');
+            $(this).addClass('is-invalid');
+        }
+    });
+
+    $("#int_b").on('keyup', function() {
+        if($(this).val() !== '' && $(this).val() > -1 && $(this).val() < 101) {
+            $(this).removeClass('is-invalid');
+            $(this).addClass('is-valid');
+        } else {
+            $(this).removeClass('is-valid');
+            $(this).addClass('is-invalid');
+        }
+    });
+  </script>
+<% end %>

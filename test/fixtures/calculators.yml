@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  int_a: 1
+  int_b: 1
+  operator: MyString
+  result: 1
+
+two:
+  int_a: 1
+  int_b: 1
+  operator: MyString
+  result: 1
